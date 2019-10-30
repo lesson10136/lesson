@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <title>THREE_JS基本架构</title>
+    <script type="text/javascript" src="js/three.js"></script>
+    <script type="text/javascript" src="js/OrbitControls.js"></script>
+    <script type="text/javascript" src="js/dat.gui.min.js"></script>
+	<script type="text/javascript" src="js/OBJLoader.js"></script>
+	<script src="js/objects/Sky.js"></script>
+    <script type="text/javascript" src="js/OBJMTLLoader.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+            background: url("Gold.jpg") center no-repeat;
+            background-size: cover;
+        }
+	 #info {
+		position: absolute;
+		padding: 10px;
+		width: 100%;
+		text-align: center;
+	 }	
+	      #div
+	 {
+	    position:absolute;
+		padding;0;
+		left:0px;
+		background-color:white;
+		width:250px;
+	 }
+    </style>
+</head>
+
+<body>
+<div id="div">
+    <span id="mybtn">选择MTL文件</span>
+<br/>
+    <input onclick="s6()" type="file" id="myfe" value="" style="opacity:0;"/>
+	<input type="file" id="myfile" value=""/>
+<br/>
+    <span id="mybtn2">选择OBJ文件</span>
+<br/>
+    <input onclick="s6()" type="file" id="myfile2" value=""/>
+	<button onclick="a8()">确定</button>
+	<button style="float:right;" onclick="s2()">收缩</button>
+</div>
+<div id="info">THREE_JS基本架构<br/></div>
+<div id="WebGL-output"></div>
+<video id="video" style="display:none" autoplay="true" controls="true" >
+    <source src="fasu.mp4" type='video/ogg'>
+</video>
+
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+    var camera,scene,renderer;		    // 定义相机、场景和渲染器变量，用于场景渲染
+    var orbitControls, clock, delta;	// 定义用于鼠标交互控制的变量
+
+// 创建场景
+    scene = new THREE.Scene();
+
+ // 创建相机
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+// 创建渲染器并设置尺寸
+    renderer = new THREE.WebGLRenderer();
+    renderer.setClearColor('rgba(200,200,190,1)',1);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMapEnabled = true;
+
+// 场景中显示坐标轴
+    var axes = new THREE.AxisHelper(20);
+    scene.add(axes);
+
+// 放置相机并指向场景的中心
+    camera.position.set(10,40,30);
+    camera.lookAt(scene.position);
+    //camera.lookAt(camera.position);
+
+// 加泛光灯照亮场景
+    light = new THREE.DirectionalLight( 0xffffff, 0.8 );
+	scene.add( light );
+// 加聚光灯形成阴影
+    var spotLight = new THREE.SpotLight(0xffffff);
+    spotLight.position.set(-40, 60, -10);
+    spotLight.castShadow = true;
+    scene.add(spotLight);
+    // 将渲染输出到html页面
+    document.getElementById("WebGL-output").appendChild(renderer.domElement);
+//================================================================================================
+    
+	
+				var sky = new THREE.Sky();
+				sky.scale.setScalar( 10000 );
+				scene.add( sky );
+
+				var uniforms = sky.material.uniforms;
+
+				uniforms.turbidity.value = 10;
+				uniforms.rayleigh.value = 2;
+				uniforms.luminance.value = 1;
+				uniforms.mieCoefficient.value = 0.005;
+				uniforms.mieDirectionalG.value = 0.8;
+
+				var parameters = {
+					distance: 400,
+					inclination: 0.49,
+					azimuth: 0.205
+				};
+
+				var cubeCamera = new THREE.CubeCamera( 1, 20000, 256 );
+				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
+
+				function updateSun() {
+
+					var theta = Math.PI * ( parameters.inclination - 0.5 );
+					var phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+
+					light.position.x = parameters.distance * Math.cos( phi );
+					light.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );
+					light.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );
+
+					sky.material.uniforms.sunPosition.value = light.position.copy( light.position );
+
+
+					cubeCamera.update( renderer, scene );
+
+				}
+
+				updateSun();
+	
+	
+	
+	
+	
+	
+	
+	
+	// 创建立方体
+	    var planeGeometry = new THREE.PlaneGeometry(200,200,1,1);
+        var planeMaterial = new THREE.MeshLambertMaterial({color:0xcccccc});
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.receiveShadow=true;
+        plane.rotation.x = -0.5 * Math .PI;
+        plane.position.set(0,-60,0);
+        scene.add(plane);
+    var cubeGeometry = new THREE.BoxGeometry(8, 8, 8);
+	var texture = new THREE.VideoTexture(video);
+    var cubeMaterial = new THREE.MeshBasicMaterial({map:texture});// 实体材质
+    var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.castShadow = true;
+    cube.position.set(0,0,0);
+    scene.add(cube);
+
+function a8(){
+	var myfileMTL;
+    var myfileOBJ;
+		     var myfile = document.getElementById('myfile');
+		 var myfile2 = document.getElementById('myfile2');
+		 myfileMTL = myfile.files[0].name;
+		 myfileOBJ = myfile2.files[0].name;
+    var mtlLoader = new THREE.MTLLoader();
+    mtlLoader.setPath('Models/');
+    mtlLoader.load(myfileMTL, function(materials) {
+ 
+    materials.preload();
+ 
+    var objLoader = new THREE.OBJLoader();
+    objLoader.setMaterials(materials);
+    objLoader.setPath('Models/');
+    objLoader.load(myfileOBJ, function(object) {
+ 
+        object.position.y = -0.5;
+		var allChildren = scene.children;
+		var lastObject = allChildren[allChildren.length-1];
+		scene.remove(lastObject);
+		//object.scale.set(0.1,0.1,0.1);
+		object.castShadow = true;
+        scene.add(object);
+ 
+    });
+ 
+});
+}
+
+
+	   var a1=document.getElementById("div"),left=a1.style.left;
+	   var timer,i=0;
+	   function s3()
+		   {
+		       a1.style.left=-i+"px";
+			   i=i+1;
+			   		   if(a1.style.left=='-190px')
+		   {
+		       clearInterval(timer);
+			   i=0;
+		   }
+		   }
+		   	   function s4()
+		   {
+		       a1.style.left=-190+i+"px";
+			   i=i+1;
+			   		   if(a1.style.left=='0px')
+		   {
+		       clearInterval(timer);
+			   i=0;
+		   }
+		   }
+	   function s2(){
+	   if(a1.style.left=='0px')
+	   {
+
+		   timer=setInterval("s3()",2);
+
+	   }
+	   else
+	   {
+	       		   timer=setInterval("s4()",2);
+	
+	   }
+	   }
+
+function s6()
+{
+   ;
+}
+
+
+
+//=================================================================================================
+// 设置交互控制
+
+    function redraw()
+	{
+	        if(controls.Model=='视频')
+			{
+			          var cubeGeometry = new THREE.BoxGeometry(8, 8, 8);
+	var texture = new THREE.VideoTexture(video);
+    var cubeMaterial = new THREE.MeshBasicMaterial({map:texture});// 实体材质
+    var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.castShadow = true;
+    cube.position.set(0,0,0);
+			    var allChildren = scene.children;
+		    var lastObject = allChildren[allChildren.length-1];
+		    scene.remove(lastObject);
+    scene.add(cube);
+			}
+			else{
+			var mtl_name = controls.Model+'.mtl';
+            var obj_name = controls.Model+'.obj';
+			var mtlLoader = new THREE.MTLLoader();
+            mtlLoader.setPath('Models/');
+            mtlLoader.load(mtl_name, function(materials) {
+ 
+            materials.preload();
+ 
+            var objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.setPath('Models/');
+            objLoader.load(obj_name, function(object) {
+		    var allChildren = scene.children;
+		    var lastObject = allChildren[allChildren.length-1];
+		    scene.remove(lastObject);
+            object.position.y = -0.5;
+			object.scale.set(0.05,0.05,0.05);
+			object.castShadow = true;
+            scene.add(object);
+ 
+                });
+ 
+            }); 
+			}
+	}
+
+    var controls = new function () {
+	    this.Model = '沙发';
+		this.showVideo=true;
+		this.showCanvas = function () {
+                if (controls.showVideo) {
+                    video.play();
+                } else {
+                    //deleteGroup("video");
+                    video.pause();
+                }
+            }
+    };
+
+// 显示交互菜单
+    var gui = new dat.GUI();
+    gui.add(controls, 'Model', ['咖啡杯', '沙发', '花瓶', '酒瓶盖', '牙膏','视频']).onChange(redraw).name("模型名");
+	gui.add(controls,'showVideo').name("播放停止");
+	/*gui.add(controls,'redraw').name("确定");*/
+//=================================================================================================
+// 新建鼠标场景控制
+    orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+    orbitControls.target = new THREE.Vector3(0, 0, 0);	// 控制焦点
+    orbitControls.autoRotate = false;				    // 将自动旋转关闭
+    clock = new THREE.Clock();					        // 用于更新鼠标交互控制
+
+
+    render();					    // 调用render函数
+    function render() {             // 渲染器
+        cube.rotation.x += -0.01;
+        cube.rotation.y += -0.01;
+        cube.rotation.z += -0.01;
+		controls.showCanvas();
+
+// 更新鼠标位置并用用requestAnimationFrame方法渲染动画
+        delta = clock.getDelta();
+        orbitControls.update(delta);
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    }
+
+//=================================================================================================
+// 页面窗口大小变化
+    function onResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+// 监听窗口变化事件
+    window.addEventListener('resize', onResize, false);
+</script>
+</body>
+</html>
