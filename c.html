@@ -1,0 +1,51 @@
+<head>
+<script>
+var i=5;
+window.document.onkeydown=a1;
+function a1(event)
+{
+   var x = event.which || event.keyCode;
+   if(x==87)
+   {
+        i=1;
+   }
+   if(x==83)
+   {
+        i=2;
+   }
+   if(x==65)
+   {
+        i=3;
+   }
+   if(x==68)
+   {
+        i=4;
+   }
+
+}
+var j=0;
+function a2()
+{
+   if(i==1)
+   {
+      document.getElementById("q1").style.top = parseInt(document.getElementById("q1").style.top)-5+'px';
+   }
+   else if(i==2)
+   {
+	  document.getElementById("q1").style.top = parseInt(document.getElementById("q1").style.top)+5+'px';
+   }
+   else if(i==3)
+   {
+      document.getElementById("q1").style.left = parseInt(document.getElementById("q1").style.left)-5+'px';
+   }
+   else if(i==4)
+   { 
+		document.getElementById("q1").style.left = parseInt(document.getElementById("q1").style.left)+5+'px';
+   }
+   else{;}
+}
+</script>
+</head>
+<body onload="a3=setInterval(a2, 1000)">
+<img id="q1" src='dian.png' style="position:absolute;left:0px;top:0%;">
+</body>
