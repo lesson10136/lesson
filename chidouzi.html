@@ -1,0 +1,123 @@
+<html>
+<head>
+<title>无聊的吃豆子</title>
+<script src="jquery.js"></script>
+<script>
+var width=window.innerWidth;
+var height=window.innerHeight;
+var score=0;
+var dir=0;
+var a1;
+var speed=1;
+var flag=false;
+function initial(){
+   $("#dou").css({"left":Math.random()*width,"top":0*height});
+}
+function douziweizhi()
+{
+   var l=Math.random()*width,t=Math.random()*height;
+   if(l>width-50)
+   {
+		l=width-100;
+   }
+   if(t>height-50)
+   {
+		t=height-100;
+   }
+   $("#dou").css({"left":l,"top":t});
+}
+function check1()
+{
+	var b1=parseInt($("#snake").css("left")),b2=parseInt($("#snake").css("top"));
+	var c1=parseInt($("#dou").css("left")),c2=parseInt($("#dou").css("top"));
+	
+	if(b1>(c1-50)&&b1<(c1+50))
+	{
+		if(b2>(c2-50)&&b2<(c2+50))
+		{
+			flag=true;
+		}
+		else flag=false;
+	}
+	else flag=false;
+	
+}
+function check()
+{
+	check1();
+	if(flag)
+	{
+		douziweizhi();
+		score=score+1;	
+		if(score%5==0)
+		{
+			speed=speed+0.1;
+		}
+		$("#a").text("得分为："+score);
+		$("#a1").text("速度为："+speed);
+	}
+
+}
+function move(dir)
+{
+	clearInterval(a1);
+	if(dir==0)
+	{
+		 a1=setInterval(function(){
+			$("#snake").css("top","-="+speed);
+			if(parseInt($("#snake").css("top"))==0)
+			{
+				$("#snake").css("top",height-50);
+			}
+			check();
+		},1)
+	}
+		if(dir==1)
+	{
+		 a1=setInterval(function(){
+			$("#snake").css("top","+="+speed);
+			if(parseInt($("#snake").css("top"))==height)
+			{
+				$("#snake").css("top",0);
+			}
+			check();
+		},1)
+	}
+		if(dir==2)
+	{
+		 a1=setInterval(function(){
+			$("#snake").css("left","-="+speed);
+			if(parseInt($("#snake").css("left"))==0)
+			{
+				$("#snake").css("left",width-50);
+			}
+			check();
+		},1)
+	}
+		if(dir==3)
+	{
+		 a1=setInterval(function(){
+			$("#snake").css("left","+="+speed);
+			if(parseInt($("#snake").css("left"))==width)
+			{
+				$("#snake").css("left",0);
+			}
+			check();
+		},1)
+	}
+}
+
+</script>
+</head>
+
+<body onload="check()">
+<div style="border:black solid 1px;width:80px;height:80px;position:absolute;top:80%;left:70%;" onclick="move(0)">上</div>
+<div style="border:black solid 1px;width:80px;height:80px;position:absolute;top:90%;left:70%; " onclick="move(1)">下</div>
+<div style="border:black solid 1px;width:80px;height:80px; position:absolute;top:90%;left:60%;"onclick="move(2)">左</div>
+<div style="border:black solid 1px;width:80px;height:80px;position:absolute;top:90%;left:80%;"onclick="move(3)">右</div>
+<img src="http://m.qpic.cn/psc?/V12JPYBN03fCYU/bmxpj0TIaxwnN1NLYawL3LV27m5hAt*yE7dTtRSTj.4saBtN76quuqlh40ReGNsf855EqET*BUdWUvtmaID2zBBe4D8lRqPHERaLL6Bxacc!/b&bo=dgBvAAAAAAADBzs!&rf=viewer_4" id="snake" style="border:black solid 1px;width:50px;height:50px;position:absolute;left:500px;top:500px"/>
+<img src="http://m.qpic.cn/psc?/V12JPYBN03fCYU/bmxpj0TIaxwnN1NLYawL3OKHVex15.RmbN6YQXzCIvhMlLdjk23ejhQDF93SebUoeY*YL5WqYZmyiRVI8t*dticxTL.P0eb1Tg*x99XDvEE!/b&bo=dwBvAAAAAAARByg!&rf=viewer_4" id="dou" style="border:black solid 1px;width:50px;height:50px;position:absolute;left:500px;top:0px"/>
+<div id="a">得分为：0</div>
+<div id="a1">速度为：1</div>
+</body>
+</html>
