@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script typet="text/javascript" src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        var timer1;//进度条定时器
+        var timer2;//游戏定时器
+        $(function () {
+            $(".kaishi").click(function () {
+                jindutiaokaishi();
+                youxikaishi();
+                $(".start").css("display","none");
+            })
+           function jindutiaokaishi(){
+                timer1=setInterval(function () {
+                   var width= $(".jindu").width();
+                   width=width-1;
+                    $(".jindu").width(width);
+                    if(width<=0){
+                        alert("游戏结束");
+                        clearInterval(timer1);
+                        clearInterval(timer2);
+                        $(".pic").remove();
+                        $(".end").css('display',"block");
+                    }
+                },100)
+            }
+
+            function youxikaishi() {
+                var wolf_1=['./images/h0.png','./images/h1.png','./images/h2.png','./images/h3.png','./images/h4.png','./images/h5.png','./images/h6.png','./images/h7.png','./images/h8.png','./images/h9.png'];
+                var wolf_2=['./images/x0.png','./images/x1.png','./images/x2.png','./images/x3.png','./images/x4.png','./images/x5.png','./images/x6.png','./images/x7.png','./images/x8.png','./images/x9.png'];
+                var weizhi = [
+                    {left:"100px",top:"115px"},
+                    {left:"20px",top:"160px"},
+                    {left:"190px",top:"142px"},
+                    {left:"105px",top:"193px"},
+                    {left:"19px",top:"221px"},
+                    {left:"202px",top:"212px"},
+                    {left:"120px",top:"275px"},
+                    {left:"30px",top:"295px"},
+                    {left:"209px",top:"297px"}
+                ];
+                var jieshu=5;
+                var weizhiIndex = Math.round(Math.random() * 8);
+                var wolfType = Math.round(Math.random()) == 0 ? wolf_1 : wolf_2;
+                var $pic = $("<img src='' class='pic' draggable='false'>");
+                var index=0;
+                $pic.css({
+                    position: "absolute",
+                    left:weizhi[weizhiIndex].left,
+                    top:weizhi[weizhiIndex].top
+                });
+                $(".container").append($pic);
+                timer2=setInterval(function () {
+                    $(".pic").attr("src",wolfType[index]);
+                    index=index+1;
+                    if(index==jieshu){
+                        $pic.remove();
+                        clearInterval(timer2);
+                        youxikaishi();
+                    }
+                },250);
+                $pic.one("click",function () {
+                    index=5;
+                    jieshu=9;
+                    var a1=$pic.attr("src");
+                    console.log(a1.indexOf("h"));
+                   if(a1.indexOf("h")>0){
+                        $(".fenshu").text(parseInt($(".fenshu").text()) + 10);
+                    }
+                    else{
+                       $(".fenshu").text(parseInt($(".fenshu").text()) - 10);
+                    }
+                    $(".jindu").css({
+                        width:"180px"
+                    })
+                })
+            }
+            $(".chongxin").click(function () {
+                $(".end").css("display","none");
+                $(".jindu").css("width","180px");
+                jindutiaokaishi();
+                youxikaishi();
+
+            })
+            $(".guize2").click(function () {
+                $(".guize").fadeToggle(500);
+            })
+        })
+    </script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .container{
+            margin: 50px auto;
+            background: url("images/game_bg.jpg") no-repeat 0 0;
+            height: 480px;
+            width: 320px;
+            position: relative;
+        }
+        .container>p1{
+            color: cornflowerblue;
+            margin-left: 60px;
+            font-size: 30px;
+        }
+        .jindu{
+            background: url("./images/progress.png") no-repeat 0 0;
+            height: 16px;
+            width: 180px;
+            position: absolute;
+            left:63px;
+            top:66px;
+        }
+        .start{
+            height: 480px;
+            width: 320px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .start>p{
+            font-size: 35px;
+            color: white;
+            background: #ff9e58;
+            border-radius: 20px;
+            text-align: center;
+            width: 150px;
+            position: relative;
+            top:300px;
+            left:85px;
+            boreer:none;
+            outline: 0px;
+        }
+        .end{
+            position: absolute;
+            top:210px;
+            left:85px;
+            display: none;
+
+        }
+        .end>p:first-child{
+            font-size: 30px;
+            color: azure;
+            margin-bottom: 50px;
+            margin-left: 10px;
+        }
+        .end>.chongxin{
+            font-size: 35px;
+            color: white;
+            background: #ff9e58;
+            border-radius: 20px;
+            text-align: center;
+            width: 150px;
+            boreer:none;
+            outline: 0px;
+        }
+        .guize{
+            background: rgba(0,0,0,0.5);
+            height: 480px;
+            width: 320px;
+            position:absolute;;
+            top:0px;
+            left: 0px;
+            display: none;
+        }
+        .guize>p{
+            color: #faff11;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .guize>p:first-child{
+            margin-top: 80px;
+        }
+        .guize2{
+            margin: -50px auto;
+            background: darkgrey;
+            height: 30px;
+            width: 320px;
+            position: relative;
+            text-align: center;
+
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <p1 class="fenshu">0</p1>
+    <div class="jindu"></div>
+    <div class="start">
+        <p class="kaishi">开始游戏</p>
+    </div>
+    <div class="end">
+        <p>游戏结束</p>
+        <p class="chongxin">重新开始</p>
+    </div>
+    <div class="guize">
+        <p>游戏规则</p>
+        <p>打中灰太狼加十分</p>
+        <p>打中小灰灰减十分</p>
+        <p>每次击中时间复原，时间用尽结束</p>
+    </div>
+</div>
+<div class="guize2">游戏规则</div>
+</body>
+</html>
